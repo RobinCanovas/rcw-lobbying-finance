@@ -1,0 +1,44 @@
+digraph G {
+  rankdir=TB; nodesep=0.55; ranksep=0.75; pad=0.3; dpi=150; bgcolor="white";
+  fontname="DejaVu Sans"; labelloc=t; fontsize=20;
+  label="Ontologie « Lobbying et finance »";
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=14, penwidth=1.4, margin="0.22,0.12"];
+  edge [fontname="DejaVu Sans", fontsize=12, penwidth=1.3, color="#444444", fontcolor="#222222"];
+
+  Org   [label="Organisation\n(banque, fédération…)", fillcolor="#cfe3fb", color="#2b6cb0"];
+  Act   [label="ActiviteLobbying\n(fiche déclarée)", fillcolor="#cfe3fb", color="#2b6cb0"];
+  Action[label="ActionRepresentation", fillcolor="#cfe3fb", color="#2b6cb0"];
+  Sect  [label="SecteurDeclare\n(ex. FINANCE)", fillcolor="#eeeeee", color="#777777"];
+  Dom   [label="DomaineIntervention", fillcolor="#eeeeee", color="#777777"];
+  Min   [label="Ministere", fillcolor="#d5efd5", color="#2f855a"];
+  Cat   [label="CategorieResponsable\n(Gouvernement, Parlement,\ncollectivités…)", fillcolor="#d5efd5", color="#2f855a"];
+  Dec   [label="TypeDecision\n(loi, acte réglementaire…)", fillcolor="#d5efd5", color="#2f855a"];
+
+  Org -> Act    [label="aDeclare"];
+  Act -> Action [label="comporteAction"];
+  Org -> Sect   [label="secteurDeclare"];
+  Act -> Dom    [label="aPourDomaine"];
+  Action -> Min [label="viseMinistere   (Q1)"];
+  Action -> Dec [label="concerneTypeDecision   (Q1)"];
+  Action -> Cat [label="viseCategorieResponsable   (Q1)"];
+
+  // Q2 : propriété transitive
+  Org -> Org [label="estAffiliéÀ\n(transitive, Q2)", color="#c05621", fontcolor="#c05621", penwidth=2];
+
+  // Q5 : sous-propriétés
+  Action -> Cat [style=dashed, color="#6b46c1", fontcolor="#6b46c1", penwidth=2, constraint=false,
+    label="Q5 (3 niveaux) : viseGouvernement, viseParlementaire\n⊑ viseResponsableNational ⊑ viseCategorieResponsable\nviseCollectivité ⊑ viseResponsableLocal ⊑ viseCategorieResponsable"];
+
+  // Q3 : classes NAF emboîtées
+  node [fillcolor="#f3e3f7", color="#97266d", fontsize=13];
+  K    [label="NAF_K\n(section K : finance et assurance)"];
+  N64  [label="NAF_64"];
+  N641 [label="NAF_641"];
+  N6419[label="NAF_6419"];
+  N6419Z[label="NAF_6419Z\n(banques)"];
+  edge [color="#97266d", fontcolor="#97266d", arrowhead=empty, penwidth=1.6];
+  N6419Z -> N6419 [label="sous-classe de"];
+  N6419 -> N641;  N641 -> N64;  N64 -> K;
+  K -> Org [label="sous-classe de\n(Q3)"];
+  { rank=same; Org; K }
+}

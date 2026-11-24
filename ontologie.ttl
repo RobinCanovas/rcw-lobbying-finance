@@ -1,0 +1,163 @@
+@prefix :     <https://example.org/rcw/lobbying/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/rcw/lobbying> a owl:Ontology ;
+    rdfs:label "Lobbying et finance"@fr ;
+    rdfs:comment "Premier exemple d'ontologie pour le répertoire HATVP (jalon 2)."@fr .
+
+# ---------------------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------------------
+:Organisation a owl:Class ;
+    rdfs:label "Organisation"@fr ;
+    rdfs:comment "Représentant d'intérêts inscrit au répertoire HATVP, ou organisation vers laquelle il est affilié."@fr .
+
+:SecteurDeclare a owl:Class ;
+    rdfs:label "Secteur déclaré"@fr ;
+    rdfs:comment "Secteur d'activité choisi par l'organisation dans le répertoire (31 valeurs, dont FINANCE)."@fr .
+
+:ActiviteLobbying a owl:Class ;
+    rdfs:label "Activité de lobbying"@fr ;
+    rdfs:comment "Fiche d'activité déclarée pour un exercice : un objet, un ou plusieurs domaines, une ou plusieurs actions."@fr .
+
+:ActionRepresentation a owl:Class ;
+    rdfs:label "Action de représentation d'intérêts"@fr ;
+    rdfs:comment "Action menée auprès de responsables publics, à propos de types de décisions."@fr .
+
+:CategorieResponsable a owl:Class ;
+    rdfs:label "Catégorie de responsable public"@fr ;
+    rdfs:comment "Une des 9 catégories du répertoire : parlementaires, Gouvernement, collectivités, etc."@fr .
+
+:Ministere a owl:Class ;
+    rdfs:label "Ministère"@fr ;
+    rdfs:comment "Intitulé de ministère tel que publié par la HATVP (19 intitulés, nomenclature 2016-2017)."@fr .
+
+:TypeDecision a owl:Class ;
+    rdfs:label "Type de décision publique"@fr ;
+    rdfs:comment "Lois, actes réglementaires, décisions d'espèce, marchés publics, etc. (11 valeurs)."@fr .
+
+:DomaineIntervention a owl:Class ;
+    rdfs:label "Domaine d'intervention"@fr .
+
+# ---------------------------------------------------------------------------
+# Propriétés d'objet
+# ---------------------------------------------------------------------------
+:aDeclare a owl:ObjectProperty ;
+    rdfs:domain :Organisation ; rdfs:range :ActiviteLobbying ;
+    rdfs:label "a déclaré"@fr .
+
+:comporteAction a owl:ObjectProperty ;
+    rdfs:domain :ActiviteLobbying ; rdfs:range :ActionRepresentation ;
+    rdfs:label "comporte l'action"@fr .
+
+:aPourDomaine a owl:ObjectProperty ;
+    rdfs:domain :ActiviteLobbying ; rdfs:range :DomaineIntervention ;
+    rdfs:label "a pour domaine"@fr .
+
+:secteurDeclare a owl:ObjectProperty ;
+    rdfs:domain :Organisation ; rdfs:range :SecteurDeclare ;
+    rdfs:label "secteur déclaré"@fr .
+
+:concerneTypeDecision a owl:ObjectProperty ;
+    rdfs:domain :ActionRepresentation ; rdfs:range :TypeDecision ;
+    rdfs:label "concerne le type de décision"@fr .
+
+:viseMinistere a owl:ObjectProperty ;
+    rdfs:domain :ActionRepresentation ; rdfs:range :Ministere ;
+    rdfs:label "vise le ministère"@fr .
+
+:viseCategorieResponsable a owl:ObjectProperty ;
+    rdfs:domain :ActionRepresentation ; rdfs:range :CategorieResponsable ;
+    rdfs:label "vise la catégorie de responsable"@fr .
+
+# --- Q2 : propriété transitive (banque -> fédération -> confédération) -----
+:estAffiliéÀ a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain :Organisation ; rdfs:range :Organisation ;
+    rdfs:label "est affiliée à"@fr ;
+    rdfs:comment "Relie une organisation à celle dont elle est membre."@fr .
+
+# --- Q5 : sous-propriétés (national / local) --------------------------------
+:viseResponsableNational a owl:ObjectProperty ;
+    rdfs:subPropertyOf :viseCategorieResponsable ;
+    rdfs:domain :ActionRepresentation ; rdfs:range :CategorieResponsable ;
+    rdfs:label "vise un responsable national"@fr .
+
+:viseResponsableLocal a owl:ObjectProperty ;
+    rdfs:subPropertyOf :viseCategorieResponsable ;
+    rdfs:domain :ActionRepresentation ; rdfs:range :CategorieResponsable ;
+    rdfs:label "vise un responsable local"@fr .
+
+:viseGouvernement a owl:ObjectProperty ;
+    rdfs:subPropertyOf :viseResponsableNational ;
+    rdfs:label "vise le Gouvernement"@fr .
+
+:viseParlementaire a owl:ObjectProperty ;
+    rdfs:subPropertyOf :viseResponsableNational ;
+    rdfs:label "vise un parlementaire"@fr .
+
+:viseCollectivité a owl:ObjectProperty ;
+    rdfs:subPropertyOf :viseResponsableLocal ;
+    rdfs:label "vise une collectivité"@fr .
+
+# ---------------------------------------------------------------------------
+# Propriétés de données
+# ---------------------------------------------------------------------------
+:siren a owl:DatatypeProperty ; rdfs:domain :Organisation ; rdfs:range xsd:string ;
+    rdfs:label "SIREN"@fr .
+:rna a owl:DatatypeProperty ; rdfs:domain :Organisation ; rdfs:range xsd:string ;
+    rdfs:label "RNA"@fr .
+:identifiantHatvp a owl:DatatypeProperty ; rdfs:domain :Organisation ; rdfs:range xsd:string ;
+    rdfs:label "identifiant HATVP"@fr .
+:annee a owl:DatatypeProperty ; rdfs:domain :ActiviteLobbying ; rdfs:range xsd:integer ;
+    rdfs:label "année de l'exercice"@fr .
+:moyenDeclare a owl:DatatypeProperty ; rdfs:domain :ActionRepresentation ;
+    rdfs:label "moyen d'action déclaré"@fr .
+
+# ---------------------------------------------------------------------------
+# Q3 : classes NAF emboîtées (exemple pour 64.19Z, les banques)
+# Les ~850 classes réelles seront générées depuis le fichier NAF de l'Insee ;
+# une organisation sera typée par son code NAF (via Sirene).
+# ---------------------------------------------------------------------------
+:NAF_K     a owl:Class ; rdfs:subClassOf :Organisation ; rdfs:label "NAF section K"@fr .
+:NAF_64    a owl:Class ; rdfs:subClassOf :NAF_K    ; rdfs:label "NAF division 64"@fr .
+:NAF_641   a owl:Class ; rdfs:subClassOf :NAF_64   ; rdfs:label "NAF groupe 64.1"@fr .
+:NAF_6419  a owl:Class ; rdfs:subClassOf :NAF_641  ; rdfs:label "NAF classe 64.19"@fr .
+:NAF_6419Z a owl:Class ; rdfs:subClassOf :NAF_6419 ; rdfs:label "NAF sous-classe 64.19Z"@fr .
+
+# ---------------------------------------------------------------------------
+# Libellés anglais (@en)
+# ---------------------------------------------------------------------------
+:Organisation rdfs:label "Organisation"@en .
+:SecteurDeclare rdfs:label "Declared sector"@en .
+:ActiviteLobbying rdfs:label "Lobbying activity"@en .
+:ActionRepresentation rdfs:label "Interest representation action"@en .
+:CategorieResponsable rdfs:label "Public official category"@en .
+:Ministere rdfs:label "Ministry"@en .
+:TypeDecision rdfs:label "Type of public decision"@en .
+:DomaineIntervention rdfs:label "Intervention domain"@en .
+:aDeclare rdfs:label "has declared"@en .
+:comporteAction rdfs:label "includes action"@en .
+:aPourDomaine rdfs:label "has domain"@en .
+:secteurDeclare rdfs:label "declared sector"@en .
+:concerneTypeDecision rdfs:label "concerns decision type"@en .
+:viseMinistere rdfs:label "targets ministry"@en .
+:viseCategorieResponsable rdfs:label "targets official category"@en .
+:estAffiliéÀ rdfs:label "is affiliated with"@en .
+:viseResponsableNational rdfs:label "targets national official"@en .
+:viseResponsableLocal rdfs:label "targets local official"@en .
+:viseGouvernement rdfs:label "targets Government"@en .
+:viseParlementaire rdfs:label "targets parliamentarian"@en .
+:viseCollectivité rdfs:label "targets local authority"@en .
+:siren rdfs:label "SIREN"@en .
+:rna rdfs:label "RNA"@en .
+:identifiantHatvp rdfs:label "HATVP identifier"@en .
+:annee rdfs:label "exercise year"@en .
+:moyenDeclare rdfs:label "declared means of action"@en .
+:NAF_K rdfs:label "NAF section K"@en .
+:NAF_64 rdfs:label "NAF division 64"@en .
+:NAF_641 rdfs:label "NAF group 64.1"@en .
+:NAF_6419 rdfs:label "NAF class 64.19"@en .
+:NAF_6419Z rdfs:label "NAF subclass 64.19Z"@en .
