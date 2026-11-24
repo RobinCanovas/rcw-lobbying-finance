@@ -1,12 +1,17 @@
 # Lobbying et finance : qui cherche à influencer les décisions publiques ?
 
-Projet de Représentation de Connaissances sur le Web (IUT d'Orsay, BUT3 Informatique, 2026-2027).
-Binôme : Nicolas LANGLOIS et Robin CANOVAS.
+*Knowledge graph of financial-sector lobbying in France, built from open data (HATVP register, Sirene, NAF, Wikidata) with RDF, OWL and SPARQL.*
 
-Un graphe de connaissances construit à partir du répertoire des représentants d'intérêts de la HATVP, croisé avec Sirene, la NAF et Wikidata, pour montrer à un citoyen non spécialiste quelles organisations financières cherchent à influencer quelles décisions publiques, et auprès de quels responsables.
+Projet de Représentation de Connaissances sur le Web (IUT d'Orsay, BUT3 Informatique, 2026-2027), par Nicolas LANGLOIS et Robin CANOVAS.
+
+Quelles banques, assurances et fédérations financières déclarent faire du lobbying, auprès de quels ministères et de quels responsables publics, et sur quels types de décisions ? Le projet répond avec un graphe de connaissances interrogeable en SPARQL, puis avec une application web pensée pour un citoyen non spécialiste.
+
+![Schéma de l'ontologie](docs/schema-ontologie.png)
+
+**In English.** The French HATVP register lists organisations that lobby public officials. We convert the finance-sector part (432 organisations, about 26 000 declared activities) to RDF with a replayable Python script, model it with an OWL ontology (multi-level class and property hierarchies, a transitive affiliation property, a NAF activity-code chain), and use an OWL2-RL reasoner in GraphDB so that questions such as "which federations represent this bank, directly or indirectly?" are only fully answered thanks to inference. The data is declarative: the graph shows who declared what, not actual influence.
 
 - Lien du dépôt de l'application web : à compléter
-- Adresse publique du site (bonus 2) : à compléter
+- Adresse publique du site : à compléter
 
 ## Avancement
 
@@ -78,3 +83,7 @@ pip install -r requirements.txt
 - Bilan 2023 du répertoire (HATVP) : https://www.hatvp.fr/wordpress/wp-content/uploads/2024/07/HATVP_BILAN_RRI-2023_VF.pdf
 
 Les données du répertoire sont déclaratives : le graphe montre qui a déclaré quoi, sans mesurer l'influence réelle ni qualifier une irrégularité.
+
+## Licence
+
+Code sous licence MIT (voir `LICENSE`). Les données restent soumises à leurs licences d'origine, listées ci-dessus.
