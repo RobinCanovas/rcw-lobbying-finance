@@ -1,0 +1,127 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\IfFileExists{french.ldf}{\usepackage[french]{babel}}{}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xltabular}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlist[itemize]{nosep,leftmargin=1.3em,itemsep=2pt}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{9pt}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\wdprop}[1]{\href{https://www.wikidata.org/wiki/Property:#1}{\texttt{wdt:#1}}}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries Fiche projet (Jalon 1) --- Lobbying et finance}
+\end{center}
+
+%------------------------------------------------------------
+\section*{1. Présentation du projet}
+
+\begin{itemize}
+  \item \textbf{Titre :} Lobbying et finance : qui cherche à influencer les décisions publiques ?
+  \item \textbf{Binôme :} Nicolas LANGLOIS, Robin CANOVAS
+  \item \textbf{Résumé :} Une application web qui montre, sans écrire de SPARQL, quelles organisations financières cherchent à influencer quelles décisions publiques, et auprès de quels responsables. Elle interroge un graphe de connaissances construit à partir du répertoire HATVP, croisé avec Sirene et Wikidata.
+  \item \textbf{Public cible :} Marc, 42 ans, salarié en Île-de-France, qui suit l'actualité politique sans être spécialiste et veut comprendre comment se prennent les décisions publiques qui le concernent.
+  \item \textbf{Besoin :} Le répertoire HATVP est publié en 15 tables séparées ou en JSON, hors de portée d'un citoyen non spécialiste. Marc veut savoir en quelques clics qui cherche à influencer quelles décisions, par quels relais et auprès de quels responsables, sans jointures ni code. L'application reste descriptive et neutre : les données sont déclaratives, elle montre qui a déclaré quoi sans mesurer l'influence réelle, et la HATVP rappelle que la représentation d'intérêts est une activité légitime (\href{https://www.hatvp.fr/wordpress/wp-content/uploads/2024/07/HATVP_BILAN_RRI-2023_VF.pdf}{bilan 2023}).
+\end{itemize}
+
+%------------------------------------------------------------
+\section*{2. Questions de compétence}
+
+Cinq questions couvrent les trois types : une de type (a), trois de type (b), une de type (c).
+
+\medskip
+{\small
+\begin{tabularx}{\linewidth}{@{}l Y c Y@{}}
+  \toprule
+  \textbf{N°} & \textbf{Question (telle que Marc la poserait)} & \textbf{Type} & \textbf{Inférence ou source}\\
+  \midrule
+  Q1 & Quels ministères et quelles catégories de responsables publics une banque donnée a-t-elle visés, et sur quels types de décisions ? & (a) & Données HATVP seules, converties en RDF.\\
+  Q2 & Par quelles fédérations, directes ou indirectes, une banque donnée est-elle représentée ? & (b) & Propriété transitive \texttt{estAffiliéÀ}.\\
+  Q3 & Quelles organisations relèvent de la finance, assurances et services auxiliaires compris ? & (b) & Sous-classes NAF jusqu'à la section K.\\
+  Q4 & Parmi les organisations qui s'adressent à un ministère choisi, lesquelles sont les plus grandes et les plus anciennes ? & (c) & Wikidata : effectif et date de création (rubrique 5).\\
+  Q5 & Les déclarations d'un secteur visent-elles plutôt des responsables nationaux ou locaux, selon le type de décision ? & (b) & Sous-propriétés de \texttt{viseResponsableNational} et \texttt{viseResponsableLocal}.\\
+  \bottomrule
+\end{tabularx}}
+
+%------------------------------------------------------------
+\section*{3. Données}
+
+Trois jeux ouverts, reliés par le numéro SIREN et par le code NAF.
+
+\medskip
+{\small
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.7cm} l >{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{1.6cm} Y@{}}
+  \toprule
+  \textbf{Jeu de données (lien)} & \textbf{Producteur} & \textbf{Licence} & \textbf{Format} & \textbf{Lignes et colonnes utiles}\\
+  \midrule
+  \endhead
+  \href{https://www.data.gouv.fr/api/1/datasets/r/46cd8d72-dd5e-4198-88b5-ab95702ba6dd}{Répertoire des représentants d'intérêts} & HATVP & Licence Ouverte (Etalab) & JSON & 4\,123 organisations, environ 113\,500 activités (2018 à 2026) ; finance : 432 organisations, environ 26\,000 activités. Colonnes : \texttt{identifiantNational}, \texttt{denomination}, \texttt{secteurs}, \texttt{affiliations}, \texttt{clients} ; par action : responsables publics, décisions concernées.\\
+  \addlinespace
+  \href{https://www.data.gouv.fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret}{Base Sirene} & Insee & Licence Ouverte 2.0 (Etalab) & Parquet ou ZIP & 3\,794 lignes (SIREN du répertoire) ; 5 colonnes : SIREN, code NAF, catégorie juridique, tranche d'effectifs, dénomination.\\
+  \addlinespace
+  \href{https://www.insee.fr/fr/statistiques/fichier/2120875/naf2008_5_niveaux.xls}{NAF rév.\ 2} & Insee & Licence Ouverte 2.0 (Etalab). Source : Insee, 08/03/2021 & XLS ou dBase & 732 lignes (une par sous-classe), 5 niveaux emboîtés, de la section à la sous-classe.\\
+  \bottomrule
+\end{xltabular}}
+
+\medskip
+\textbf{Clé commune :} le SIREN, identifiant de 3\,794 des 4\,123 organisations (92\,\%), relie HATVP et Sirene ; le code NAF de Sirene relie ensuite chaque organisation à la hiérarchie NAF. Les 125 associations (RNA) et 204 organisations à identifiant HATVP restent sans lien Sirene.
+
+%------------------------------------------------------------
+\section*{4. Raisonnement et conversion}
+
+\textbf{Raisonnement.} Un axiome par question de type (b) :
+
+{\footnotesize
+\begin{verbatim}
+# Q2 : propriété transitive (banque -> fédération -> confédération)
+:estAffiliéÀ a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain :Organisation ; rdfs:range :Organisation .
+# Q3 : sous-classes NAF
+:NAF_6419Z rdfs:subClassOf :NAF_6419 .  :NAF_6419 rdfs:subClassOf :NAF_641 .
+:NAF_641 rdfs:subClassOf :NAF_64 .      :NAF_64 rdfs:subClassOf :NAF_K .
+# Q5 : sous-propriétés
+:viseGouvernement rdfs:subPropertyOf :viseResponsableNational .
+:viseParlementaire rdfs:subPropertyOf :viseResponsableNational .
+:viseCollectivité rdfs:subPropertyOf :viseResponsableLocal .
+\end{verbatim}}
+
+\textbf{Conversion.} Un script Python (rdflib) lit le JSON HATVP et l'extrait Sirene, puis écrit \texttt{graphe-}\allowbreak\texttt{initial.ttl} selon l'ontologie construite dans Protégé. Aucun LLM ne convertit les données. Les tables des dirigeants et des collaborateurs (personnes physiques) restent hors du graphe. Les inférences sont vérifiées dans GraphDB avec le ruleset OWL2-RL.
+
+%------------------------------------------------------------
+\section*{5. Wikidata}
+
+\begin{itemize}
+  \item \textbf{Entités à lier :} les organisations du graphe (quelques milliers).
+  \item \textbf{Propriété de liage :} SIREN (\wdprop{P1616}) pour les entreprises, RNA (\wdprop{P3918}) pour les associations, jamais le nom.
+  \item \textbf{Méthode :} requête fédérée (\texttt{SERVICE}) par lots avec \texttt{VALUES}, testée avec \texttt{CONSTRUCT} puis \texttt{LIMIT}, qui produit des liens \texttt{owl:sameAs} ajoutés par \texttt{INSERT}. Nous mesurons le taux de liage et analysons les échecs (petites structures, entités étrangères), puis nous vérifions les doublons que OWL2-RL peut créer.
+\end{itemize}
+
+\medskip
+{\small
+\begin{tabularx}{\linewidth}{@{}l l Y@{}}
+  \toprule
+  \textbf{Propriété récupérée} & \textbf{Identifiant} & \textbf{Question servie}\\
+  \midrule
+  Effectif & \wdprop{P1128} & Q4 : les plus grandes organisations\\
+  Date de création & \wdprop{P571} & Q4 : les plus anciennes\\
+  Logo & \wdprop{P154} & Q2 et Q4 : fiche de l'organisation\\
+  \bottomrule
+\end{tabularx}}
+
+\end{document}
