@@ -1,0 +1,17 @@
+PREFIX ex:   <https://example.org/rcw/lobbying/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Q3 (type b) : quelles organisations relèvent de la finance, assurances et
+# services auxiliaires compris ?
+# Inférence : chaque organisation est typée par son code NAF le plus précis
+# (ex. NAF_6419Z) ; les classes NAF sont emboîtées jusqu'à la section K.
+# Sans raisonneur, cette requête ne renvoie rien (personne n'est typé NAF_K
+# directement) ; avec OWL2-RL, elle renvoie toutes les organisations de la
+# section K.
+# Nécessite le typage NAF issu de Sirene (étape à venir).
+SELECT ?org ?libelle
+WHERE {
+  ?org a ex:NAF_K ;
+       rdfs:label ?libelle .
+}
+ORDER BY ?libelle

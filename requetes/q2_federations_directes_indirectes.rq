@@ -1,0 +1,21 @@
+PREFIX ex:   <https://example.org/rcw/lobbying/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Q2 (type b) : par quelles fédérations, directes ou indirectes, une banque
+# donnée est-elle représentée ?
+# Inférence : ex:estAffiliéÀ est transitive. Avec le ruleset OWL2-RL, banque ->
+# fédération -> confédération donne aussi banque -> confédération.
+# Comparaison : ajouter  FROM <http://www.ontotext.com/explicit>  avant WHERE
+# pour ne voir que les affiliations déclarées (directes) : la réponse est
+# alors incomplète.
+# Le FILTER écarte les auto-affiliations créées par les cycles déclarés
+# dans le répertoire (A affiliée à B et B affiliée à A).
+SELECT DISTINCT ?federation ?libelle
+WHERE {
+  VALUES ?siren { "662042449" }
+  ?banque ex:siren ?siren ;
+          ex:estAffiliéÀ ?federation .
+  ?federation rdfs:label ?libelle .
+  FILTER(?federation != ?banque)
+}
+ORDER BY ?libelle

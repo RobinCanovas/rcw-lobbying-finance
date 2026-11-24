@@ -1,0 +1,23 @@
+PREFIX ex:   <https://example.org/rcw/lobbying/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Q1 (type a) : quels ministères, quelles catégories de responsables publics et
+# quels types de décisions une banque donnée a-t-elle visés ?
+# Données HATVP seules, aucune inférence nécessaire.
+# Pour une autre banque, changer le SIREN dans VALUES (662042449 = BNP Paribas).
+SELECT ?axe ?valeur (COUNT(DISTINCT ?action) AS ?nbActions)
+WHERE {
+  VALUES ?siren { "662042449" }
+  ?org ex:siren ?siren ;
+       ex:aDeclare/ex:comporteAction ?action .
+  { ?action ex:viseMinistere/rdfs:label ?valeur .
+    BIND("Ministère" AS ?axe) }
+  UNION
+  { ?action ex:viseCategorieResponsable/rdfs:label ?valeur .
+    BIND("Catégorie de responsable" AS ?axe) }
+  UNION
+  { ?action ex:concerneTypeDecision/rdfs:label ?valeur .
+    BIND("Type de décision" AS ?axe) }
+}
+GROUP BY ?axe ?valeur
+ORDER BY ?axe DESC(?nbActions)

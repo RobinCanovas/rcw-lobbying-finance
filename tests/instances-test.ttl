@@ -1,0 +1,32 @@
+@prefix :     <https://example.org/rcw/lobbying/> .
+@prefix t:    <https://example.org/rcw/lobbying/test/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Instances de test, comme on en ajouterait à la main dans Protégé.
+
+# Q2 : banque -> fédération -> confédération
+t:banque       a :Organisation, :NAF_6419Z ; rdfs:label "Banque test"@fr .
+t:federation   a :Organisation ; rdfs:label "Fédération test"@fr .
+t:confederation a :Organisation ; rdfs:label "Confédération test"@fr .
+t:banque     :estAffiliéÀ t:federation .
+t:federation :estAffiliéÀ t:confederation .
+
+# Q5 : une action visant le Gouvernement, une le Parlement, une une collectivité
+t:action1 a :ActionRepresentation ; :viseGouvernement  t:catGouv .
+t:action2 a :ActionRepresentation ; :viseParlementaire t:catParl .
+t:action3 a :ActionRepresentation ; :viseCollectivité  t:catColl .
+t:catGouv a :CategorieResponsable ; rdfs:label "Membre du Gouvernement ou membre de cabinet ministériel"@fr .
+t:catParl a :CategorieResponsable ; rdfs:label "Député, sénateur"@fr .
+t:catColl a :CategorieResponsable ; rdfs:label "Élu ou membre de cabinet d'une collectivité territoriale"@fr .
+
+# Cas limite connu : deux organisations déclarées affiliées l'une à l'autre.
+t:cycleA a :Organisation ; :estAffiliéÀ t:cycleB .
+t:cycleB a :Organisation ; :estAffiliéÀ t:cycleA .
+
+# Pour les requêtes Q1 et Q5 : une banque de test avec une activité.
+t:banque :siren "000000000" ; :secteurDeclare <https://example.org/rcw/lobbying/secteur/FINANCE> ;
+         :aDeclare t:fiche1 .
+t:fiche1 a :ActiviteLobbying ; :comporteAction t:action1 .
+t:action1 :viseCategorieResponsable t:catGouv ; :viseMinistere t:minEco ; :concerneTypeDecision t:decLoi .
+t:minEco a :Ministere ; rdfs:label "Economie et finances"@fr .
+t:decLoi a :TypeDecision ; rdfs:label "Lois, y compris constitutionnelles"@fr .

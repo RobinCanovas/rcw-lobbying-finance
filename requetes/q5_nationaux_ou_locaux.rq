@@ -1,0 +1,23 @@
+PREFIX ex:   <https://example.org/rcw/lobbying/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# Q5 (type b) : les déclarations d'un secteur visent-elles plutôt des
+# responsables publics nationaux ou locaux, selon le type de décision ?
+# Inférence : ex:viseGouvernement et ex:viseParlementaire sont des
+# sous-propriétés de ex:viseResponsableNational ; ex:viseCollectivité l'est de
+# ex:viseResponsableLocal. Sans raisonneur, les deux propriétés agrégées
+# n'ont aucune valeur dans les données.
+# Pour un autre secteur, changer l'IRI du secteur déclaré.
+SELECT ?decision ?niveau (COUNT(DISTINCT ?action) AS ?nbActions)
+WHERE {
+  ?org ex:secteurDeclare <https://example.org/rcw/lobbying/secteur/FINANCE> ;
+       ex:aDeclare/ex:comporteAction ?action .
+  ?action ex:concerneTypeDecision/rdfs:label ?decision .
+  { ?action ex:viseResponsableNational ?categorie .
+    BIND("National" AS ?niveau) }
+  UNION
+  { ?action ex:viseResponsableLocal ?categorie .
+    BIND("Local" AS ?niveau) }
+}
+GROUP BY ?decision ?niveau
+ORDER BY ?decision ?niveau
